@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🐄 เตือนให้อาหารน้องวัวอิอิ By Babyg</title>
+<style>
+  /* ฟอนต์และพื้นฐาน */
+  @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;700&display=swap');
+  body {
+    margin: 0;
+    font-family: 'Kanit', sans-serif;
+    background: linear-gradient(135deg, #a8e063, #56ab2f);
+    color: #1b262c;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 15px 60px;
+  }
+  h1 {
+    font-weight: 700;
+    font-size: 2.8rem;
+    margin-bottom: 15px;
+    color: #e9f1f7;
+    text-shadow: 1px 1px 6px rgba(0,0,0,0.3);
+  }
+  p {
+    font-size: 1.15rem;
+    margin-bottom: 12px;
+    color: #dff0d8;
+    text-shadow: 0 0 3px rgba(0,0,0,0.2);
+  }
+  input[type=number] {
+    font-size: 1.1rem;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: none;
+    width: 100px;
+    text-align: center;
+    box-shadow: inset 0 0 8px #448c33;
+  }
+  button {
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    user-select: none;
+  }
+  #startBtn {
+    background: #154734;
+    color: #d1f0b0;
+    margin-right: 20px;
+  }
+  #startBtn:hover {
+    background: #206a39;
+  }
+  #stopBtn {
+    background: #7c1919;
+    color: #f2dede;
+    display: none;
+  }
+  #stopBtn:hover {
+    background: #a02828;
+  }
+  #log {
+    margin-top: 30px;
+    width: 100%;
+    max-width: 520px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .round-box {
+    background: rgba(255 255 255 / 0.9);
+    border-radius: 20px;
+    padding: 25px 30px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    position: relative;
+    overflow: hidden;
+  }
+  .round-box::before {
+    content: "รอบ ";
+    position: absolute;
+    top: 18px;
+    left: 25px;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #4caf50;
+  }
+  .round-box h2 {
+    margin: 0 0 10px 65px;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #2c6f27;
+    user-select: none;
+  }
+  .progress-container {
+    width: 100%;
+    background: #e0e0e0;
+    border-radius: 30px;
+    height: 30px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.12);
+  }
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #4caf50 0%, #81c784 100%);
+    border-radius: 30px 0 0 30px;
+    transition: width 0.5s ease-out;
+    box-shadow: 0 0 8px 1px #4caf50cc;
+  }
+  .countdown {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 12px;
+    color: #33691e;
+    user-select: none;
+    text-align: right;
+  }
+
+  /* Popup สวยงาม */
+  #overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(6px);
+    z-index: 9998;
+    display: none;
+  }
+  .popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 40px 50px;
+    border-radius: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: #1b262c;
+    z-index: 9999;
+    max-width: 400px;
+    text-align: center;
+    user-select: none;
+    display: none;
+  }
+  .popup img {
+    width: 110px;
+    margin-bottom: 25px;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25));
+  }
+  /* ปุ่มปิด popup */
+  #stopPopupBtn {
+    margin-top: 30px;
+    padding: 14px 40px;
+    border-radius: 30px;
+    border: none;
+    background: #4caf50;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.7);
+    transition: background 0.3s ease;
+  }
+  #stopPopupBtn:hover {
+    background: #388e3c;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    body {
+      padding: 20px 12px 40px;
+    }
+    .round-box h2 {
+      margin-left: 50px;
+      font-size: 1.5rem;
+    }
+    #startBtn, #stopBtn {
+      font-size: 1rem;
+      padding: 10px 22px;
+    }
+    .progress-container {
+      height: 25px;
+    }
+    .progress-bar {
+      transition: width 0.3s ease-out;
+    }
+    .countdown {
+      font-size: 1rem;
+    }
+    .popup {
+      font-size: 1.6rem;
+      padding: 25px 30px;
+      max-width: 320px;
+    }
+    .popup img {
+      width: 80px;
+      margin-bottom: 18px;
+    }
+    #stopPopupBtn {
+      padding: 10px 28px;
+      font-size: 1rem;
+    }
+  }
+</style>
+</head>
+<body>
+  <h1>🐄 เตือนให้อาหารน้องวัวอิอิ By Babyg</h1>
+  <p>เวลาต่อรอบ (นาที): <input type="number" id="totalTime" value="60" min="1" /> นาที</p>
+  <div>
+    <button id="startBtn" onclick="startTimer()">เริ่มตั้งเตือน</button>
+    <button id="stopBtn" onclick="stopTimer()">หยุดการทำงาน</button>
+  </div>
+  <div id="log"></div>
+
+  <div id="overlay"></div>
+  <div id="popup" class="popup">
+    <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="ไอคอนวัว" />
+    <div id="popupMessage"></div>
+    <button id="stopPopupBtn" onclick="stopTimer()">หยุดการทำงาน</button>
+  </div>
+
+  <script>
+    const pingSound = new Audio(
+      "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YYQAAAAA////AP///wD///8A////AP///wD///8A////AP///wD///8A"
+    );
+
+    let timers = [];
+    let intervals = [];
+    let repeatSoundTimers = [];
+
+    function playPingRepeated(times = 3, interval = 1000) {
+      let count = 0;
+      function playOnce() {
+        if (count >= times) return;
+        pingSound.currentTime = 0;
+        pingSound.play();
+        count++;
+        if (count < times) {
+          let t = setTimeout(playOnce, interval);
+          repeatSoundTimers.push(t);
+        }
+      }
+      playOnce();
+    }
+
+    function showPopup(message) {
+      const overlay = document.getElementById("overlay");
+      const popup = document.getElementById("popup");
+      const popupMessage = document.getElementById("popupMessage");
+
+      popupMessage.innerText = message;
+      overlay.style.display = "block";
+      popup.style.display = "block";
+    }
+
+    function hidePopup() {
+      const overlay = document.getElementById("overlay");
+      const popup = document.getElementById("popup");
+
+      overlay.style.display = "none";
+      popup.style.display = "none";
+    }
+
+    function startTimer() {
+      stopTimer();
+      document.getElementById("startBtn").style.display = "none";
+      document.getElementById("stopBtn").style.display = "inline-block";
+
+      const total = parseInt(document.getElementById("totalTime").value);
+      const milestones = [0.3, 0.6, 0.9];
+      const logDiv = document.getElementById("log");
+      logDiv.innerHTML = "";
+
+      for (let round = 1; round <= 3; round++) {
+        let roundBox = document.createElement("div");
+        roundBox.className = "round-box";
+        roundBox.innerHTML = `
+          <h2>${round}</h2>
+          <div class="progress-container"><div class="progress-bar" id="progress${round}"></div></div>
+          <p class="countdown" id="countdown${round}">เหลือเวลา: ${total}:00</p>
+        `;
+        logDiv.appendChild(roundBox);
+
+        let startTime = Date.now() + (round - 1) * total * 60 * 1000;
+        let endTime = startTime + total * 60 * 1000;
+
+        let progressInterval = setInterval(() => {
+          let now = Date.now();
+          let remaining = Math.max(0, Math.floor((endTime - now) / 1000));
+          let minutes = String(Math.floor(remaining / 60)).padStart(2, "0");
+          let seconds = String(remaining % 60).padStart(2, "0");
+          document.getElementById(`countdown${round}`).innerText = `เหลือเวลา: ${minutes}:${seconds}`;
+          let elapsedPercent = ((total * 60 - remaining) / (total * 60)) * 100;
+          document.getElementById(`progress${round}`).style.width = `${elapsedPercent}%`;
+          if (remaining <= 0) clearInterval(progressInterval);
+        }, 1000);
+        intervals.push(progressInterval);
+
+        // เตือน 30%, 60%, 90%
+        milestones.forEach(percent => {
+          const minutes = total * percent;
+          const delay = ((round - 1) * total + minutes) * 60 * 1000;
+          let t = setTimeout(() => {
+            playPingRepeated(3, 1000);
+            showPopup(`รอบ ${round} ถึง ${percent * 100}% แล้ว!`);
+            document.getElementById(`progress${round}`).style.background = "linear-gradient(90deg, #FF9800, #FFC107)";
+            setTimeout(() => { hidePopup(); }, 3000);
+          }, delay);
+          timers.push(t);
+        });
+
+        // เตือน 100% เฉพาะรอบสุดท้าย (รอบ 3)
+        if (round === 3) {
+          const delay = round * total * 60 * 1000;
+          let t = setTimeout(() => {
+            playPingRepeated(3, 1000);
+            showPopup(`รอบ ${round} จบแล้ว! ถึงเวลารวบรวมวัวแล้ว! 🐄`);
+            document.getElementById(`progress${round}`).style.background = "linear-gradient(90deg, #2196F3, #64B5F6)";
+            setTimeout(() => { hidePopup(); }, 3000);
+          }, delay);
+          timers.push(t);
+        }
+      }
+    }
+
+    function stopTimer() {
+      timers.forEach(t => clearTimeout(t));
+      intervals.forEach(i => clearInterval(i));
+      repeatSoundTimers.forEach(t => clearTimeout(t));
+      timers = [];
+      intervals = [];
+      repeatSoundTimers = [];
+      pingSound.pause();
+      pingSound.currentTime = 0;
+      hidePopup();
+      document.getElementById("startBtn").style.display = "inline-block";
+      document.getElementById("stopBtn").style.display = "none";
+    }
+  </script>
+</body>
+</html>
+<!-- ส่วนท้ายโดเนท -->
+<footer style="margin-top: 40px; padding: 20px; background: rgba(255 255 255 / 0.9); border-radius: 15px; box-shadow: 0 6px 20px rgba(0,0,0,0.12); max-width: 520px; width: 100%; text-align: center; font-family: 'Kanit', sans-serif;">
+  <h3 style="color: #2c6f27; margin-bottom: 10px;">🙏 สนับสนุนผู้พัฒนา</h3>
+  <p style="color: #33691e; font-weight: 600; margin-bottom: 15px;">ถ้าชอบแอปนี้ รบกวนช่วยโดเนทเล็กๆน้อยๆเพื่อเป็นค่าเทอมคับ 😊</p>
+  <a href="https://ezdn.app/urbabyg" target="_blank" rel="noopener" 
+     style="background: #4caf50; color: white; padding: 15px 40px; border-radius: 30px; text-decoration: none; font-weight: 700; font-size: 1.3rem; box-shadow: 0 6px 20px #388e3c; display: inline-block; user-select: none;">
+    โดเนทที่นี่
+  </a>
+</footer>
+
